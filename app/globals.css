@@ -1,0 +1,554 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+    --color-blue: #94eaff;
+    --color-light-100: #e7f2ff;
+    --color-light-200: #bdbdbd;
+    --color-border-dark: #151024;
+    --color-dark-100: #0d161a;
+    --color-dark-200: #182830;
+    --radius: 0.625rem;
+    --background: #030708;
+    --foreground: #ffffff;
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.145 0 0);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.145 0 0);
+    --primary: #59deca;
+    --primary-foreground: oklch(0.985 0 0);
+    --secondary: oklch(0.97 0 0);
+    --secondary-foreground: oklch(0.205 0 0);
+    --muted: oklch(0.97 0 0);
+    --muted-foreground: oklch(0.556 0 0);
+    --accent: oklch(0.97 0 0);
+    --accent-foreground: oklch(0.205 0 0);
+    --destructive: oklch(0.577 0.245 27.325);
+    --border: oklch(0.922 0 0);
+    --input: oklch(0.922 0 0);
+    --ring: oklch(0.708 0 0);
+    --chart-1: oklch(0.646 0.222 41.116);
+    --chart-2: oklch(0.6 0.118 184.704);
+    --chart-3: oklch(0.398 0.07 227.392);
+    --chart-4: oklch(0.828 0.189 84.429);
+    --chart-5: oklch(0.769 0.188 70.08);
+    --sidebar: oklch(0.985 0 0);
+    --sidebar-foreground: oklch(0.145 0 0);
+    --sidebar-primary: oklch(0.205 0 0);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.97 0 0);
+    --sidebar-accent-foreground: oklch(0.205 0 0);
+    --sidebar-border: oklch(0.922 0 0);
+    --sidebar-ring: oklch(0.708 0 0);
+}
+
+@theme inline {
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-blue: var(--color-blue);
+    --color-light-100: var(--color-light-100);
+    --color-light-200: var(--color-light-200);
+    --color-border-dark: var(--color-border-dark);
+    --color-dark-100: var(--color-dark-100);
+    --color-dark-200: var(--color-dark-200);
+    --font-schibsted-grotesk: var(--font-schibsted-grotesk);
+    --font-martian-mono: var(--font-martian-mono);
+    --color-sidebar-ring: var(--sidebar-ring);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar: var(--sidebar);
+    --color-chart-5: var(--chart-5);
+    --color-chart-4: var(--chart-4);
+    --color-chart-3: var(--chart-3);
+    --color-chart-2: var(--chart-2);
+    --color-chart-1: var(--chart-1);
+    --color-ring: var(--ring);
+    --color-input: var(--input);
+    --color-border: var(--border);
+    --color-destructive: var(--destructive);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-accent: var(--accent);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-muted: var(--muted);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-secondary: var(--secondary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-primary: var(--primary);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-popover: var(--popover);
+    --color-card-foreground: var(--card-foreground);
+    --color-card: var(--card);
+    --radius-sm: calc(var(--radius) - 4px);
+    --radius-md: calc(var(--radius) - 2px);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) + 4px);
+}
+
+@utility flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@utility text-gradient {
+    background-image: linear-gradient(to bottom, var(--tw-gradient-stops));
+    --tw-gradient-from: white var(--tw-gradient-from-position);
+    --tw-gradient-to: var(--color-blue) var(--tw-gradient-to-position);
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+    -webkit-background-clip: text;
+    background-clip: text;
+    font-weight: 600;
+    color: transparent;
+}
+
+@utility glass {
+    background-color: rgba(18, 18, 18, 0.5);
+    border-radius: var(--radius-md);
+    background-clip: padding-box;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border-bottom-width: 1px;
+    border-bottom-color: var(--color-border-dark);
+}
+
+@utility card-shadow {
+    box-shadow: 0px 4px 40px 0px #00000066;
+}
+
+@layer base {
+    * {
+        border-color: var(--color-border);
+        outline-color: color-mix(in oklch, var(--color-ring) 50%, transparent);
+    }
+
+    body {
+        background-color: var(--color-background);
+        color: var(--color-foreground);
+    }
+
+    main {
+        margin-left: auto;
+        margin-right: auto;
+        width: 100%;
+        max-width: var(--container-7xl);
+        display: flex;
+        flex-direction: column;
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+        padding-top: 2.5rem;
+        padding-bottom: 2.5rem;
+    }
+
+   h1 {
+    background: linear-gradient(to bottom, #ffffff, var(--color-blue));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-size: 3.75rem;
+    line-height: 1;
+    font-weight: 600;
+    transition: all 0.5s ease;
+}
+
+    h3 {
+        font-family: var(--font-schibsted-grotesk);
+        font-size: 1.5rem;
+        line-height: 2rem;
+        font-weight: 700;
+    }
+
+    ul {
+        list-style-type: none;
+        list-style-position: inside;
+    }
+}
+
+@layer components {
+    #home .subheading {
+        color: var(--color-light-100);
+        font-size: 1.125rem;
+        line-height: 1.75rem;
+        text-align: center;
+        margin-top: 1.25rem;
+    }
+
+    #explore-btn {
+        border-width: 1px;
+        border-color: var(--color-dark-200);
+        background-color: var(--color-dark-100);
+        display: flex;
+        width: fit-content;
+        cursor: pointer;
+        border-radius: 9999px;
+        padding-left: 2rem;
+        padding-right: 2rem;
+        padding-top: 0.875rem;
+        padding-bottom: 0.875rem;
+        text-align: center;
+    }
+
+    #explore-btn a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        text-align: center;
+        width: 100%;
+    }
+
+    header {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background-color: rgba(18, 18, 18, 0.5);
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        border-bottom-width: 1px;
+        border-bottom-color: var(--color-border-dark);
+    }
+
+    header nav {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        margin-left: auto;
+        margin-right: auto;
+        width: 100%;
+        max-width: var(--container-7xl);
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+
+    header .logo {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    header .logo p {
+        font-size: 1.25rem;
+        line-height: 1.75rem;
+        font-weight: 700;
+        font-style: italic;
+    }
+
+    header ul {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    /* ===== تنسيقات روابط الـ Navbar مع Hover باللون #5dfeca ===== */
+    header ul li a {
+        color: white;
+        text-decoration: none;
+        font-size: 1rem;
+        font-weight: 500;
+        padding: 0.5rem 0;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+    
+    /* تأثير Hover باللون #5dfeca */
+    header ul li a:hover {
+        color: #5dfeca;
+        text-shadow: 0 0 10px rgba(93, 254, 202, 0.5);
+    }
+    
+    /* خط تحت الرابط عند Hover */
+    header ul li a::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background-color: #5dfeca;
+        box-shadow: 0 0 10px #5dfeca;
+        transition: width 0.3s ease;
+    }
+    
+    header ul li a:hover::after {
+        width: 100%;
+    }
+    /* ===== نهاية تنسيقات الـ Navbar ===== */
+
+    .events {
+        display: grid;
+        gap: 2.5rem;
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+
+    #event-card {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    #event-card .poster {
+        height: 300px;
+        width: 100%;
+        border-radius: var(--radius-lg);
+        object-fit: cover;
+    }
+
+    #event-card .title {
+        font-size: 20px;
+        font-weight: 600;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 1;
+    }
+
+    #event-card p {
+        color: var(--color-light-200);
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        font-weight: 300;
+    }
+
+    #event-card .datetime {
+        color: var(--color-light-200);
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    #event-card .datetime div {
+        display: flex;
+        flex-direction: row;
+        gap: 0.5rem;
+    }
+
+    #event .header {
+        display: flex;
+        width: 66.666667%;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 2.5rem;
+    }
+
+    #event .details {
+        display: flex;
+        width: 100%;
+        flex-direction: column;
+        gap: 3rem;
+        align-items: flex-start;
+        margin-top: 3rem;
+    }
+
+    #event .details .content {
+        display: flex;
+        flex: 2;
+        flex-direction: column;
+        gap: 2rem;
+        width: 100%;
+    }
+
+    #event .details .content .banner {
+        max-height: 457px;
+        width: 100%;
+        border-radius: var(--radius-lg);
+        object-fit: cover;
+    }
+
+    #event .details .content .agenda {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    #event .details .content .agenda ul li {
+        color: var(--color-light-100);
+        font-size: 1.125rem;
+        line-height: 1.75rem;
+    }
+
+    #event .details .booking {
+        flex: 1;
+        width: 100%;
+        padding: 1rem;
+        border-left-width: 1px;
+        border-left-color: rgb(55 65 81);
+    }
+
+    #event .details .booking .signup-card {
+        background-color: var(--color-dark-100);
+        border-width: 1px;
+        border-color: var(--color-dark-200);
+        box-shadow: 0px 4px 40px 0px #00000066;
+        display: flex;
+        width: 100%;
+        flex-direction: column;
+        gap: 1.5rem;
+        border-radius: 10px;
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+        padding-top: 1.5rem;
+        padding-bottom: 1.5rem;
+    }
+
+    #event h2 {
+        font-family: var(--font-schibsted-grotesk);
+        font-size: 1.5rem;
+        line-height: 2rem;
+        font-weight: 700;
+    }
+
+    #event p {
+        color: var(--color-light-100);
+        font-size: 1.125rem;
+        line-height: 1.75rem;
+    }
+
+    .pill {
+        background-color: var(--color-dark-100);
+        color: var(--color-light-100);
+        font-size: 0.75rem;
+        line-height: 1rem;
+        border-radius: 6px;
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+
+    #book-event {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    #book-event form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    #book-event form div {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    #book-event form div input {
+        background-color: var(--color-dark-200);
+        border-radius: 6px;
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+        padding-top: 0.625rem;
+        padding-bottom: 0.625rem;
+    }
+
+    #book-event form button {
+        background-color: var(--color-primary);
+        width: 100%;
+        cursor: pointer;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        padding-top: 0.625rem;
+        padding-bottom: 0.625rem;
+        font-size: 1.125rem;
+        line-height: 1.75rem;
+        font-weight: 600;
+        color: black;
+    }
+
+    #book-event form button:hover {
+        background-color: color-mix(in oklch, var(--color-primary) 90%, transparent);
+    }
+}
+
+@media (min-width: 640px) {
+    main {
+        padding-left: 2.5rem;
+        padding-right: 2.5rem;
+    }
+
+    #home .subheading {
+        font-size: 1.125rem;
+        line-height: 1.75rem;
+    }
+}
+
+@media (min-width: 768px) {
+    .events {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1024px) {
+    .events {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    #event .details {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+
+    #event .details .booking {
+        width: auto;
+    }
+}
+
+@media (max-width: 640px) {
+    h1 {
+        font-size: 2.25rem;
+        line-height: 2.5rem;
+    }
+
+    #home .subheading {
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+    }
+
+    header .logo p {
+        display: none;
+    }
+
+    #explore-btn {
+        width: 100%;
+    }
+
+    #event .details .content .agenda ul li {
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+    }
+
+    #event p {
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+    }
+}
+
+@media (max-width: 1024px) {
+    #event .header {
+        width: 100%;
+    }
+
+    #event .details {
+        align-items: center;
+    }
+
+    #event .details .content {
+        width: 100%;
+    }
+}
