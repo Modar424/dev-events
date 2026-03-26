@@ -4,6 +4,7 @@ import Event from './event.model';
 export interface IBooking extends Document {
   eventId: Types.ObjectId;
   email: string;
+  slug: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -27,6 +28,11 @@ const bookingSchema = new Schema<IBooking>(
         message: 'Email must be a valid email address',
       },
     },
+    slug: {
+      type: String,
+      required: [true, 'Slug is required'],
+      trim: true,
+    },
   },
   { timestamps: true }
 );
@@ -43,6 +49,6 @@ bookingSchema.pre<IBooking>('save', async function () {
 // Create index on eventId for faster queries
 bookingSchema.index({ eventId: 1 });
 
-const Booking = mongoose.model<IBooking>('Booking', bookingSchema);
+const Booking = mongoose.models.Booking || mongoose.model<IBooking>('Booking', bookingSchema);
 
 export default Booking;
