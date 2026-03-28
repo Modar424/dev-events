@@ -5,6 +5,8 @@ import { IEvent } from "@/database/event.model";
 import { getSimilarEventBySlug } from "@/lib/actions/event.actions";
 import EventCard from "@/components/EventCard";
 
+export const dynamic = 'force-dynamic';
+
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 
 const EventDetailItem = ({ icon, alt, label }: { icon: string; alt: string; label: string }) => (
