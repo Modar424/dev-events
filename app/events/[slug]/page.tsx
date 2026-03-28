@@ -2,12 +2,10 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Bookevent from "@/components/Bookevent";
 import { IEvent } from "@/database/event.model";
-import { getSimilarEventBySlug } from "@/lib/actions/event.actions";
+import { getSimilarEventBySlug, getEventBySlug, getBookingCount } from "@/lib/actions/event.actions";
 import EventCard from "@/components/EventCard";
 
 export const dynamic = 'force-dynamic';
-
-const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 
 const EventDetailItem = ({ icon, alt, label }: { icon: string; alt: string; label: string }) => (
     <div className="flex items-center gap-2">
@@ -31,9 +29,7 @@ const EventTags = ({ tags }: { tags?: string[] | string }) => {
     if (!tags) return null;
     const tagsString = Array.isArray(tags) ? tags[0] : tags;
     if (!tagsString) return null;
-
     const tagsArray = tagsString.replace(/[\[\],]/g, '').trim().split(/\s+/);
-
     return (
         <div className="flex flex-row gap-1.5 flex-wrap">
             {tagsArray.map((tag, index) => (
@@ -46,20 +42,13 @@ const EventTags = ({ tags }: { tags?: string[] | string }) => {
 const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
     const { slug } = await params;
 
-    // Fetch event details
-    const request = await fetch(`${BASE_URL}/api/events/${slug}`);
+    const event = await getEventBySlug(slug);
+    if (!event) return notFound();
 
-    if (!request.ok) return notFound();
-
-    const { event } = await request.json();
     const { _id, description, image, overview, date, time, location, mode, audience, agenda, organizer, tags } = event;
-
     if (!description) return notFound();
 
-    // ✅ جلب عدد الحجوزات الحقيقي من قاعدة البيانات
-    const bookingRes = await fetch(`${BASE_URL}/api/bookings?slug=${slug}`);
-    const { count: bookingCount } = await bookingRes.json();
-
+    const bookingCount = await getBookingCount(slug);
     const similarEvents: IEvent[] = await getSimilarEventBySlug(slug);
 
     return (
@@ -69,7 +58,6 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
                 <p className="mt-2">{description}</p>
             </div>
             <div className="details">
-                {/* left side */}
                 <div className="content">
                     <Image src={image} alt="Event Banner" width={800} height={800} className="banner" />
                     <section className="flex-col gap-2">
@@ -92,12 +80,9 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
                     <EventTags tags={tags} />
                 </div>
 
-                {/* right side */}
                 <aside className="booking">
                     <div className="Singup-card">
                         <h2>Book Your Spot</h2>
-
-                        {/* ✅ عدد حقيقي من قاعدة البيانات */}
                         {bookingCount > 0 ? (
                             <p className="text-sm mt-2">
                                 {bookingCount} {bookingCount === 1 ? 'person has' : 'people have'} already booked!
@@ -105,8 +90,6 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
                         ) : (
                             <p className="text-sm">Be the first one to book your spot!</p>
                         )}
-
-                        {/* ✅ تمرير eventId و slug للـ component */}
                         <Bookevent eventId={_id} slug={slug} />
                     </div>
                 </aside>
