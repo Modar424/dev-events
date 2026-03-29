@@ -4,44 +4,86 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+    /* Colors - Light mode defaults */
+    --color-blue: #2563eb;
+    --color-light-100: #1f2937;
+    --color-light-200: #4b5563;
+    --color-border-dark: #e5e7eb;
+    --color-dark-100: #f9fafb;
+    --color-dark-200: #f3f4f6;
+    --radius: 0.625rem;
+    --background: #ffffff;
+    --foreground: #111827;
+    --card: #ffffff;
+    --card-foreground: #111827;
+    --popover: #ffffff;
+    --popover-foreground: #111827;
+    --primary: #2563eb;
+    --primary-foreground: #ffffff;
+    --secondary: #f3f4f6;
+    --secondary-foreground: #111827;
+    --muted: #f3f4f6;
+    --muted-foreground: #6b7280;
+    --accent: #f3f4f6;
+    --accent-foreground: #111827;
+    --destructive: #ef4444;
+    --border: #e5e7eb;
+    --input: #e5e7eb;
+    --ring: #3b82f6;
+    --chart-1: #3b82f6;
+    --chart-2: #10b981;
+    --chart-3: #f59e0b;
+    --chart-4: #ef4444;
+    --chart-5: #8b5cf6;
+    --sidebar: #f9fafb;
+    --sidebar-foreground: #111827;
+    --sidebar-primary: #2563eb;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: #f3f4f6;
+    --sidebar-accent-foreground: #111827;
+    --sidebar-border: #e5e7eb;
+    --sidebar-ring: #3b82f6;
+}
+
+.dark {
+    /* Colors - Dark mode overrides */
     --color-blue: #94eaff;
     --color-light-100: #e7f2ff;
     --color-light-200: #bdbdbd;
     --color-border-dark: #151024;
     --color-dark-100: #0d161a;
     --color-dark-200: #182830;
-    --radius: 0.625rem;
     --background: #030708;
     --foreground: #ffffff;
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
+    --card: #0f172a;
+    --card-foreground: #ffffff;
+    --popover: #0f172a;
+    --popover-foreground: #ffffff;
     --primary: #59deca;
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
-    --chart-1: oklch(0.646 0.222 41.116);
-    --chart-2: oklch(0.6 0.118 184.704);
-    --chart-3: oklch(0.398 0.07 227.392);
-    --chart-4: oklch(0.828 0.189 84.429);
-    --chart-5: oklch(0.769 0.188 70.08);
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.708 0 0);
+    --primary-foreground: #030708;
+    --secondary: #1e293b;
+    --secondary-foreground: #ffffff;
+    --muted: #1e293b;
+    --muted-foreground: #94a3b8;
+    --accent: #1e293b;
+    --accent-foreground: #ffffff;
+    --destructive: #ef4444;
+    --border: #1e293b;
+    --input: #1e293b;
+    --ring: #59deca;
+    --chart-1: #59deca;
+    --chart-2: #a855f7;
+    --chart-3: #f97316;
+    --chart-4: #ef4444;
+    --chart-5: #22d3ee;
+    --sidebar: #0a0c10;
+    --sidebar-foreground: #ffffff;
+    --sidebar-primary: #59deca;
+    --sidebar-primary-foreground: #030708;
+    --sidebar-accent: #1e293b;
+    --sidebar-accent-foreground: #ffffff;
+    --sidebar-border: #1e293b;
+    --sidebar-ring: #59deca;
 }
 
 @theme inline {
@@ -98,7 +140,7 @@
 
 @utility text-gradient {
     background-image: linear-gradient(to bottom, var(--tw-gradient-stops));
-    --tw-gradient-from: white var(--tw-gradient-from-position);
+    --tw-gradient-from: var(--foreground) var(--tw-gradient-from-position);
     --tw-gradient-to: var(--color-blue) var(--tw-gradient-to-position);
     --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
     -webkit-background-clip: text;
@@ -108,28 +150,32 @@
 }
 
 @utility glass {
-    background-color: rgba(18, 18, 18, 0.5);
+    background-color: color-mix(in oklch, var(--background) 80%, transparent);
     border-radius: var(--radius-md);
     background-clip: padding-box;
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     border-bottom-width: 1px;
-    border-bottom-color: var(--color-border-dark);
+    border-bottom-color: var(--border);
 }
 
 @utility card-shadow {
+    box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.05);
+}
+
+.dark .card-shadow {
     box-shadow: 0px 4px 40px 0px #00000066;
 }
 
 @layer base {
     * {
-        border-color: var(--color-border);
-        outline-color: color-mix(in oklch, var(--color-ring) 50%, transparent);
+        border-color: var(--border);
+        outline-color: color-mix(in oklch, var(--ring) 50%, transparent);
     }
 
     body {
-        background-color: var(--color-background);
-        color: var(--color-foreground);
+        background-color: var(--background);
+        color: var(--foreground);
     }
 
     main {
@@ -145,16 +191,16 @@
         padding-bottom: 2.5rem;
     }
 
-   h1 {
-    background: linear-gradient(to bottom, #ffffff, var(--color-blue));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    font-size: 3.75rem;
-    line-height: 1;
-    font-weight: 600;
-    transition: all 0.5s ease;
-}
+    h1 {
+        background: linear-gradient(to bottom, var(--foreground), var(--color-blue));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        font-size: 3.75rem;
+        line-height: 1;
+        font-weight: 600;
+        transition: all 0.5s ease;
+    }
 
     h3 {
         font-family: var(--font-schibsted-grotesk);
@@ -171,7 +217,7 @@
 
 @layer components {
     #home .subheading {
-        color: var(--color-light-100);
+        color: var(--muted-foreground);
         font-size: 1.125rem;
         line-height: 1.75rem;
         text-align: center;
@@ -180,8 +226,8 @@
 
     #explore-btn {
         border-width: 1px;
-        border-color: var(--color-dark-200);
-        background-color: var(--color-dark-100);
+        border-color: var(--border);
+        background-color: var(--secondary);
         display: flex;
         width: fit-content;
         cursor: pointer;
@@ -191,6 +237,12 @@
         padding-top: 0.875rem;
         padding-bottom: 0.875rem;
         text-align: center;
+        transition: all 0.3s ease;
+    }
+    
+    #explore-btn:hover {
+        border-color: var(--primary);
+        transform: scale(1.02);
     }
 
     #explore-btn a {
@@ -200,17 +252,18 @@
         gap: 0.5rem;
         text-align: center;
         width: 100%;
+        color: var(--foreground);
     }
 
     header {
         position: sticky;
         top: 0;
         z-index: 50;
-        background-color: rgba(18, 18, 18, 0.5);
+        background-color: color-mix(in oklch, var(--background) 80%, transparent);
         -webkit-backdrop-filter: blur(10px);
         backdrop-filter: blur(10px);
         border-bottom-width: 1px;
-        border-bottom-color: var(--color-border-dark);
+        border-bottom-color: var(--border);
     }
 
     header nav {
@@ -248,9 +301,8 @@
         gap: 1.5rem;
     }
 
-    /* ===== تنسيقات روابط الـ Navbar مع Hover باللون #5dfeca ===== */
     header ul li a {
-        color: white;
+        color: var(--foreground);
         text-decoration: none;
         font-size: 1rem;
         font-weight: 500;
@@ -259,13 +311,11 @@
         transition: all 0.3s ease;
     }
     
-    /* تأثير Hover باللون #5dfeca */
     header ul li a:hover {
-        color: #5dfeca;
-        text-shadow: 0 0 10px rgba(93, 254, 202, 0.5);
+        color: var(--primary);
+        text-shadow: 0 0 10px color-mix(in oklch, var(--primary) 50%, transparent);
     }
     
-    /* خط تحت الرابط عند Hover */
     header ul li a::after {
         content: '';
         position: absolute;
@@ -273,15 +323,14 @@
         left: 0;
         width: 0;
         height: 2px;
-        background-color: #5dfeca;
-        box-shadow: 0 0 10px #5dfeca;
+        background-color: var(--primary);
+        box-shadow: 0 0 8px var(--primary);
         transition: width 0.3s ease;
     }
     
     header ul li a:hover::after {
         width: 100%;
     }
-    /* ===== نهاية تنسيقات الـ Navbar ===== */
 
     .events {
         display: grid;
@@ -293,6 +342,11 @@
         display: flex;
         flex-direction: column;
         gap: 0.75rem;
+        transition: all 0.3s ease;
+    }
+    
+    #event-card:hover {
+        transform: translateY(-4px);
     }
 
     #event-card .poster {
@@ -309,17 +363,18 @@
         display: -webkit-box;
         -webkit-box-orient: vertical;
         -webkit-line-clamp: 1;
+        color: var(--foreground);
     }
 
     #event-card p {
-        color: var(--color-light-200);
+        color: var(--muted-foreground);
         font-size: 0.875rem;
         line-height: 1.25rem;
         font-weight: 300;
     }
 
     #event-card .datetime {
-        color: var(--color-light-200);
+        color: var(--muted-foreground);
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
@@ -373,7 +428,7 @@
     }
 
     #event .details .content .agenda ul li {
-        color: var(--color-light-100);
+        color: var(--muted-foreground);
         font-size: 1.125rem;
         line-height: 1.75rem;
     }
@@ -383,14 +438,14 @@
         width: 100%;
         padding: 1rem;
         border-left-width: 1px;
-        border-left-color: rgb(55 65 81);
+        border-left-color: var(--border);
     }
 
     #event .details .booking .signup-card {
-        background-color: var(--color-dark-100);
+        background-color: var(--card);
         border-width: 1px;
-        border-color: var(--color-dark-200);
-        box-shadow: 0px 4px 40px 0px #00000066;
+        border-color: var(--border);
+        box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.05);
         display: flex;
         width: 100%;
         flex-direction: column;
@@ -401,6 +456,10 @@
         padding-top: 1.5rem;
         padding-bottom: 1.5rem;
     }
+    
+    .dark #event .details .booking .signup-card {
+        box-shadow: 0px 4px 40px 0px #00000066;
+    }
 
     #event h2 {
         font-family: var(--font-schibsted-grotesk);
@@ -410,14 +469,14 @@
     }
 
     #event p {
-        color: var(--color-light-100);
+        color: var(--muted-foreground);
         font-size: 1.125rem;
         line-height: 1.75rem;
     }
 
     .pill {
-        background-color: var(--color-dark-100);
-        color: var(--color-light-100);
+        background-color: var(--secondary);
+        color: var(--secondary-foreground);
         font-size: 0.75rem;
         line-height: 1rem;
         border-radius: 6px;
@@ -446,16 +505,24 @@
     }
 
     #book-event form div input {
-        background-color: var(--color-dark-200);
+        background-color: var(--input);
+        border: 1px solid var(--border);
         border-radius: 6px;
         padding-left: 1.25rem;
         padding-right: 1.25rem;
         padding-top: 0.625rem;
         padding-bottom: 0.625rem;
+        color: var(--foreground);
+    }
+    
+    #book-event form div input:focus {
+        outline: none;
+        border-color: var(--ring);
+        ring: 2px solid var(--ring);
     }
 
     #book-event form button {
-        background-color: var(--color-primary);
+        background-color: var(--primary);
         width: 100%;
         cursor: pointer;
         align-items: center;
@@ -468,11 +535,13 @@
         font-size: 1.125rem;
         line-height: 1.75rem;
         font-weight: 600;
-        color: black;
+        color: var(--primary-foreground);
+        transition: all 0.3s ease;
     }
 
     #book-event form button:hover {
-        background-color: color-mix(in oklch, var(--color-primary) 90%, transparent);
+        background-color: color-mix(in oklch, var(--primary) 90%, transparent);
+        transform: scale(1.02);
     }
 }
 
@@ -551,4 +620,89 @@
     #event .details .content {
         width: 100%;
     }
+}
+
+/* ─── Dark / Light theme transitions ─────────────────────────────────────── */
+*, *::before, *::after {
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.2s ease, box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+/* Shimmer keyframe for skeleton + button */
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.shimmer {
+    background: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.05) 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite linear;
+}
+
+.dark .shimmer {
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.08) 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite linear;
+}
+
+/* Animated gradient background shift */
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.gradient-animate {
+    background-size: 200% 200%;
+    animation: gradientShift 6s ease infinite;
+}
+
+/* Neon glow – dark mode only */
+.dark .neon-cyan {
+    box-shadow: 0 0 20px rgba(34, 211, 238, 0.4), 0 0 40px rgba(34, 211, 238, 0.1);
+}
+
+.dark .neon-purple {
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.4), 0 0 40px rgba(168, 85, 247, 0.1);
+}
+
+/* Light mode glow effects */
+html:not(.dark) .neon-cyan {
+    box-shadow: 0 0 15px rgba(37, 99, 235, 0.2), 0 0 30px rgba(37, 99, 235, 0.1);
+}
+
+html:not(.dark) .neon-purple {
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.2), 0 0 30px rgba(139, 92, 246, 0.1);
+}
+
+/* select option color fix in dark mode */
+.dark select option {
+    background: var(--background);
+    color: var(--foreground);
+}
+
+/* Light mode select option */
+html:not(.dark) select option {
+    background: var(--background);
+    color: var(--foreground);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--muted);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in oklch, var(--primary) 80%, transparent);
 }

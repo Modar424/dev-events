@@ -1,36 +1,204 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🎉 Dev-Events - منصة إدارة الأحداث للمطورين
 
-## Getting Started
+منصة ويب حديثة لاكتشاف وإدارة وحجز أحداث المطورين مثل الهاكاثونات والندوات والمؤتمرات.
 
-First, run the development server:
+## ✨ الميزات
+
+### للمستخدمين
+- 📅 **استعراض الأحداث** - اكتشف أحداث المطورين القادمة
+- 🔍 **تفاصيل الأحداث** - عرض شامل لمعلومات الحدث
+- 💼 **حجز الأحداث** - تسجيل الحضور عبر البريد الإلكتروني
+- 🎯 **أحداث مشابهة** - اكتشف أحداثاً ذات صلة
+- 📱 **تصميم responsive** - يعمل على جميع الأجهزة
+
+### لمنظمي الأحداث
+- ➕ **إنشاء أحداث** - أضف أحداثاً جديدة مع الصور
+- ✏️ **تعديل الأحداث** - حدّث معلومات الحدث
+- 🗑️ **حذف الأحداث** - احذف الأحداث القديمة
+- 📊 **لوحة تحكم** - إدارة جميع الأحداث
+- 📈 **تحليلات** - تتبع الحجوزات والإحصائيات
+
+## 🛠️ التقنيات المستخدمة
+
+- **Frontend**: React 19, Next.js 16, TypeScript, Tailwind CSS
+- **Backend**: Next.js API Routes
+- **Database**: MongoDB + Mongoose
+- **Storage**: Cloudinary
+- **Icons**: Lucide React
+- **Validation**: Zod
+- **Analytics**: PostHog
+
+## 📋 المتطلبات
+
+- Node.js (v18+)
+- npm أو yarn
+- MongoDB Atlas أو محلي
+- Cloudinary Account
+
+## 🚀 البدء السريع
+
+### 1. استنساخ المستودع
+
+```bash
+git clone https://github.com/yourusername/dev-events.git
+cd dev-events
+```
+
+### 2. تثبيت المكتبات
+
+```bash
+npm install
+```
+
+### 3. إعداد متغيرات البيئة
+
+أنشئ ملف `.env.local`:
+
+```env
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/dev-events
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+NEXT_PUBLIC_POSTHOG_KEY=your_posthog_key
+NEXT_PUBLIC_POSTHOG_HOST=your_posthog_host
+```
+
+### 4. تشغيل خادم التطوير
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+افتح [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📂 بنية المشروع
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+dev-events/
+├── app/
+│   ├── api/              # API endpoints
+│   │   ├── events/       # CRUD operations للأحداث
+│   │   └── bookings/     # إدارة الحجوزات
+│   ├── events/
+│   │   ├── create/       # صفحة إنشاء حدث
+│   │   ├── [slug]/       # صفحة تفاصيل الحدث
+│   │   └── [slug]/edit/  # صفحة تعديل الحدث
+│   ├── admin/            # لوحة التحكم
+│   ├── layout.tsx        # القالب الرئيسي
+│   └── page.tsx          # الصفحة الرئيسية
+├── components/           # مكونات React
+├── database/             # Mongoose models
+├── lib/                  # الدوال المساعدة
+│   ├── validation/       # Zod schemas
+│   ├── actions/          # Server actions
+│   └── errors.ts         # معالجة الأخطاء
+├── public/               # الملفات الثابتة
+└── package.json          # المكتبات
+```
 
-## Learn More
+## 🔌 API Endpoints
 
-To learn more about Next.js, take a look at the following resources:
+### الأحداث
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+# الحصول على جميع الأحداث
+GET /api/events?page=1&limit=10
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# الحصول على حدث واحد
+GET /api/events/[slug]
 
-## Deploy on Vercel
+# إنشاء حدث
+POST /api/events
+Content-Type: multipart/form-data
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# تحديث حدث
+PUT /api/events/[slug]
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# حذف حدث
+DELETE /api/events/[slug]
+```
+
+### الحجوزات
+
+```bash
+# إنشاء حجز
+POST /api/bookings
+
+# الحصول على عدد الحجوزات
+GET /api/bookings?slug=event-slug
+```
+
+## 🎨 الواجهات الجديدة
+
+### ✨ صفحة Create Event (`/events/create`)
+- نموذج شامل لإنشاء أحداث جديدة
+- معاينة الصور قبل الرفع
+- Validation على الـ frontend و server
+- رسائل خطأ واضحة وفورية
+- دعم تحميل ملفات صور بأحجام كبيرة
+
+### ✏️ صفحة Edit Event (`/events/[slug]/edit`)
+- تحميل بيانات الحدث الحالية تلقائياً
+- تعديل جميع حقول الحدث
+- خيار تحديث أو إبقاء الصورة القديمة
+- زر حذف الحدث مع تأكيد
+- منع فقدان البيانات
+
+### 📊 Admin Dashboard (`/admin`)
+- جدول منظم لجميع الأحداث
+- إحصائيات فورية (أحداث قادمة، ماضية، إجمالي الحجوزات)
+- بحث في الأحداث والتصفية حسب النوع
+- إجراءات سريعة (تعديل وحذف)
+- تأكيد قبل حذف الأحداث
+
+## 🔒 الأمان المحسّن
+
+✅ **Validation شامل** - على الـ frontend و server  
+✅ **Input Sanitization** - قبول الحقول المصرح بها فقط  
+✅ **Email Validation** - تحقق من صحة البريد الإلكتروني  
+✅ **File Validation** - التحقق من حجم ونوع الملفات  
+✅ **MongoDB Protection** - منع الـ injection attacks  
+✅ **Error Handling** - معالجة أخطاء موحدة  
+
+## 📊 التحسينات الرئيسية
+
+### ✨ إضافات جديدة:
+
+1. **Zod Validation** - Validation schema قوي للنماذج
+2. **Input Sanitization** - تنظيف المدخلات من الحقول الضارة
+3. **Improved Error Handling** - معالجة أخطاء موحدة وواضحة
+4. **Complete CRUD** - إنشاء وقراءة وتحديث وحذف الأحداث
+5. **Admin Dashboard** - لوحة تحكم متقدمة
+6. **Pagination** - تقسيم الأحداث إلى صفحات
+7. **Search & Filter** - بحث وتصفية الأحداث
+
+## 🚀 النشر
+
+### نشر على Vercel
+
+```bash
+npm install -g vercel
+vercel
+```
+
+ثم أضف متغيرات البيئة في Vercel dashboard
+
+## 📝 المساهمة
+
+1. Fork المستودع
+2. أنشئ branch جديد (`git checkout -b feature/amazing`)
+3. Commit التغييرات (`git commit -m 'Add amazing feature'`)
+4. Push إلى البرانش (`git push origin feature/amazing`)
+5. افتح Pull Request
+
+## 📄 الترخيص
+
+MIT License - انظر LICENSE file
+
+## 📧 الدعم
+
+للدعم، أرسل بريد إلى support@devevents.com أو افتح issue في GitHub
+
+---
+
+صنع بـ ❤️ من قبل [اسمك]

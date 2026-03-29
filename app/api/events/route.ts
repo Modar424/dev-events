@@ -26,6 +26,12 @@ interface EventData {
 }
 
 export async function POST(req: NextRequest) {
+  const { getServerSession } = await import('next-auth');
+  const { authOptions } = await import('@/app/api/auth/[...nextauth]/route');
+  const session = await getServerSession(authOptions);
+  if (!session || (session.user as { role?: string })?.role !== 'admin') {
+    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+  }
   try {
     await connectDB();
     const formData = await req.formData();
