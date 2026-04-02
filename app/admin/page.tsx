@@ -454,7 +454,7 @@ export default function AdminDashboard() {
                       >
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
-                            <Image src={event.image} alt={event.title} width={40} height={40} className="rounded-lg object-cover flex-shrink-0" />
+                            <Image src={event.image} alt={event.title} width={40} height={40} className="rounded-lg object-cover shrink-0" />
                             <div>
                               <p className="font-medium text-sm dark:text-white text-gray-900 line-clamp-1">{event.title}</p>
                               <p className="text-xs dark:text-gray-500 text-gray-400 mt-0.5">{event.slug}</p>

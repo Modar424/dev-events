@@ -6,7 +6,7 @@ import { v2 as Cloudinary } from 'cloudinary';
 const ALLOWED_FIELDS = [
   'title', 'description', 'overview', 'venue',
   'location', 'date', 'time', 'mode', 'audience',
-  'organizer', 'tags', 'agenda'
+  'organizer', 'tags', 'agenda', 'capacity'
 ];
 
 interface EventData {
@@ -22,6 +22,7 @@ interface EventData {
   organizer?: string;
   tags?: string;
   agenda?: string;
+  capacity?: string;
   image?: string;
 }
 
@@ -67,7 +68,14 @@ export async function POST(req: NextRequest) {
 
     eventData.image = uploadResult.secure_url;
 
-    const createdEvent = await Event.create(eventData);
+    // Convert capacity to number and convert tags string to array
+    const processedData = {
+      ...eventData,
+      capacity: eventData.capacity ? Number(eventData.capacity) : undefined,
+      tags: eventData.tags ? eventData.tags.split(',').map((tag: string) => tag.trim()) : [],
+    };
+
+    const createdEvent = await Event.create(processedData);
     return NextResponse.json(
       { message: 'Event created successfully', event: createdEvent },
       { status: 201 }

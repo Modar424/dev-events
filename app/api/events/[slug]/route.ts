@@ -17,6 +17,7 @@ interface EventData {
   organizer?: string;
   tags?: string;
   agenda?: string;
+  capacity?: string;
   image?: string;
 }
 
@@ -29,7 +30,7 @@ interface CloudinaryUploadResult {
 const ALLOWED_FIELDS = [
   'title', 'description', 'overview', 'venue',
   'location', 'date', 'time', 'mode', 'audience',
-  'organizer', 'tags', 'agenda'
+  'organizer', 'tags', 'agenda', 'capacity'
 ] as const;
 
 type AllowedField = typeof ALLOWED_FIELDS[number];

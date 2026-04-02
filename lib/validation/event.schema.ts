@@ -37,6 +37,11 @@ export const eventFormSchema = z.object({
   
   tags: z.string()
     .min(1, 'Tags are required'),
+
+  capacity: z.string()
+    .refine((val) => !isNaN(Number(val)), 'Capacity must be a number')
+    .refine((val) => Number(val) >= 1, 'Capacity must be at least 1')
+    .refine((val) => Number(val) <= 100000, 'Capacity cannot exceed 100,000'),
 });
 
 export type EventFormData = z.infer<typeof eventFormSchema>;

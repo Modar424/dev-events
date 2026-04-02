@@ -5,14 +5,15 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { eventFormSchema } from '@/lib/validation/event.schema';
 import { z } from 'zod';
+import { Plus, Trash2, GripVertical } from 'lucide-react';
 
 type EventFormData = z.infer<typeof eventFormSchema>;
 
 export default function CreateEventPage() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
-  const [formData, setFormData] = useState<EventFormData & { tags: string }>({
+
+  const [formData, setFormData] = useState<EventFormData>({
     title: '',
     description: '',
     overview: '',
@@ -24,8 +25,10 @@ export default function CreateEventPage() {
     audience: '',
     organizer: '',
     tags: '',
+    capacity: '',
   });
 
+  const [agendaItems, setAgendaItems] = useState<string[]>(['']);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -34,62 +37,52 @@ export default function CreateEventPage() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    // Clear error for this field when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
-    }
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
+  };
+
+  const handleAgendaChange = (index: number, value: string) => {
+    const updated = [...agendaItems];
+    updated[index] = value;
+    setAgendaItems(updated);
+    if (errors.agenda) setErrors(prev => ({ ...prev, agenda: '' }));
+  };
+
+  const addAgendaItem = () => setAgendaItems(prev => [...prev, '']);
+
+  const removeAgendaItem = (index: number) => {
+    if (agendaItems.length === 1) return;
+    setAgendaItems(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Validate file size (5MB max)
-      if (file.size > 5 * 1024 * 1024) {
-        setErrors(prev => ({ ...prev, image: 'Image size must not exceed 5MB' }));
-        return;
-      }
-
+      if (file.size > 5 * 1024 * 1024) { setErrors(prev => ({ ...prev, image: 'Image size must not exceed 5MB' })); return; }
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-        setErrors(prev => ({ ...prev, image: '' }));
-      };
+      reader.onloadend = () => { setImagePreview(reader.result as string); setErrors(prev => ({ ...prev, image: '' })); };
       reader.readAsDataURL(file);
     }
   };
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
-
-    // Validate using Zod
     const result = eventFormSchema.safeParse(formData);
     if (!result.success) {
-      result.error.issues.forEach((err: z.ZodIssue) => {
-        const field = err.path[0] as string;
-        newErrors[field] = err.message;
-      });
+      result.error.issues.forEach((err: z.ZodIssue) => { newErrors[err.path[0] as string] = err.message; });
     }
-
-    // Validate image
-    if (!imagePreview && !fileInputRef.current?.files?.length) {
-      newErrors.image = 'Event image is required';
-    }
-
+    if (!imagePreview && !fileInputRef.current?.files?.length) newErrors.image = 'Event image is required';
+    const validAgenda = agendaItems.filter(a => a.trim());
+    if (validAgenda.length === 0) newErrors.agenda = 'At least one agenda item is required';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!validateForm()) return;
-
     setLoading(true);
-
     try {
       const formDataObj = new FormData();
-      
-      // Add text fields
       formDataObj.append('title', formData.title);
       formDataObj.append('description', formData.description);
       formDataObj.append('overview', formData.overview);
@@ -101,323 +94,203 @@ export default function CreateEventPage() {
       formDataObj.append('audience', formData.audience);
       formDataObj.append('organizer', formData.organizer);
       formDataObj.append('tags', formData.tags);
-      
-      // Add agenda as array
-      formDataObj.append('agenda', JSON.stringify([
-        'Introduction',
-        'Main Session',
-        'Q&A',
-        'Networking'
-      ]));
+      formDataObj.append('capacity', formData.capacity);
+      const validAgenda = agendaItems.filter(a => a.trim());
+      formDataObj.append('agenda', JSON.stringify(validAgenda));
+      if (fileInputRef.current?.files?.length) formDataObj.append('images', fileInputRef.current.files[0]);
 
-      // Add image file
-      if (fileInputRef.current?.files?.length) {
-        formDataObj.append('images', fileInputRef.current.files[0]);
-      }
-
-      const response = await fetch('/api/events', {
-        method: 'POST',
-        body: formDataObj,
-      });
-
+      const response = await fetch('/api/events', { method: 'POST', body: formDataObj });
       const data = await response.json();
-
-      if (!response.ok) {
-        setErrors({ submit: data.message || 'Failed to create event' });
-        return;
-      }
-
+      if (!response.ok) { setErrors({ submit: data.message || 'Failed to create event' }); return; }
       setSuccess(true);
-      setTimeout(() => {
-        router.push('/');
-      }, 2000);
+      setTimeout(() => router.push('/'), 2000);
     } catch (err) {
       setErrors({ submit: err instanceof Error ? err.message : 'An error occurred' });
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
   if (success) {
     return (
-      <section className="space-y-6 py-20">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-green-500 mb-4">✓ Event Created Successfully!</h1>
-          <p className="text-lg text-gray-400">Redirecting to home page...</p>
-        </div>
+      <section className="flex flex-col items-center justify-center py-20 gap-4">
+        <div className="create-success-icon">✓</div>
+        <h1 className="create-success-title">Event Created!</h1>
+        <p className="create-success-sub">Redirecting to home page...</p>
       </section>
     );
   }
 
   return (
-    <section className="space-y-6 py-8 md:py-10 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
-      <div className="header mb-8 md:mb-10">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">Create New Event</h1>
-        <p className="text-gray-400 mt-2 text-sm sm:text-base">Add a new event to the platform</p>
+    <section className="create-form-section">
+      <div className="create-form-header">
+        <h1>Create New Event</h1>
+        <p>Fill in the details to publish your event</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+      <form onSubmit={handleSubmit} className="create-form">
+
         {/* Title */}
-        <div className="form-group">
-          <label htmlFor="title" className="block text-sm font-medium mb-2">
-            Event Title *
-          </label>
-          <input
-            type="text"
-            id="title"
-            name="title"
-            value={formData.title}
-            onChange={handleInputChange}
-            placeholder="Example: Web Development Hackathon 2024"
-            className={`w-full px-4 py-2 border rounded-lg bg-black text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 ${
-              errors.title ? 'border-red-500' : 'border-gray-600'
-            }`}
-          />
-          {errors.title && <p className="text-red-400 text-sm mt-1">{errors.title}</p>}
+        <div className="form-field">
+          <label htmlFor="title">Event Title <span className="required">*</span></label>
+          <input type="text" id="title" name="title" value={formData.title} onChange={handleInputChange}
+            placeholder="e.g. Web Development Hackathon 2025"
+            className={errors.title ? 'input-error' : ''} />
+          {errors.title && <p className="field-error">{errors.title}</p>}
         </div>
 
         {/* Description */}
-        <div className="form-group">
-          <label htmlFor="description" className="block text-sm font-medium mb-2">
-            Description *
-          </label>
-          <textarea
-            id="description"
-            name="description"
-            value={formData.description}
-            onChange={handleInputChange}
-            placeholder="Brief description of the event"
-            rows={3}
-            className={`w-full px-4 py-2 border rounded-lg bg-black text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 ${
-              errors.description ? 'border-red-500' : 'border-gray-600'
-            }`}
-          />
-          {errors.description && <p className="text-red-400 text-sm mt-1">{errors.description}</p>}
+        <div className="form-field">
+          <label htmlFor="description">Short Description <span className="required">*</span></label>
+          <textarea id="description" name="description" value={formData.description} onChange={handleInputChange}
+            placeholder="A brief summary of the event" rows={3}
+            className={errors.description ? 'input-error' : ''} />
+          {errors.description && <p className="field-error">{errors.description}</p>}
         </div>
 
         {/* Overview */}
-        <div className="form-group">
-          <label htmlFor="overview" className="block text-sm font-medium mb-2">
-            Overview *
-          </label>
-          <textarea
-            id="overview"
-            name="overview"
-            value={formData.overview}
-            onChange={handleInputChange}
-            placeholder="Detailed description of the event"
-            rows={4}
-            className={`w-full px-4 py-2 border rounded-lg bg-black text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 ${
-              errors.overview ? 'border-red-500' : 'border-gray-600'
-            }`}
-          />
-          {errors.overview && <p className="text-red-400 text-sm mt-1">{errors.overview}</p>}
+        <div className="form-field">
+          <label htmlFor="overview">Overview <span className="required">*</span></label>
+          <textarea id="overview" name="overview" value={formData.overview} onChange={handleInputChange}
+            placeholder="Detailed description of what attendees can expect" rows={5}
+            className={errors.overview ? 'input-error' : ''} />
+          {errors.overview && <p className="field-error">{errors.overview}</p>}
         </div>
 
         {/* Image */}
-        <div className="form-group">
-          <label htmlFor="image" className="block text-xs sm:text-sm font-medium mb-2">
-            Event Image *
-          </label>
+        <div className="form-field">
+          <label htmlFor="image">Event Image <span className="required">*</span></label>
           {imagePreview && (
-            <div className="mb-4">
-              <Image
-                src={imagePreview}
-                alt="Preview"
-                width={400}
-                height={300}
-                className="rounded-lg w-full max-h-48 sm:max-h-64 object-cover"
-              />
+            <div className="image-preview-wrap">
+              <Image src={imagePreview} alt="Preview" width={600} height={300} className="image-preview" />
             </div>
           )}
-          <input
-            type="file"
-            id="image"
-            ref={fileInputRef}
-            onChange={handleImageChange}
-            accept="image/*"
-            className="w-full"
-          />
-          {errors.image && <p className="text-red-400 text-sm mt-1">{errors.image}</p>}
-          <p className="text-xs text-gray-400 mt-1">PNG, JPG, GIF up to 5MB</p>
+          <input type="file" id="image" ref={fileInputRef} onChange={handleImageChange} accept="image/*" className="file-input" />
+          {errors.image && <p className="field-error">{errors.image}</p>}
+          <p className="field-hint">PNG, JPG, GIF up to 5MB</p>
         </div>
 
         {/* Location & Venue */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="form-group">
-            <label htmlFor="location" className="block text-sm font-medium mb-2">
-              Location *
-            </label>
-            <input
-              type="text"
-              id="location"
-              name="location"
-              value={formData.location}
-              onChange={handleInputChange}
-              placeholder="Example: Amsterdam, Netherlands"
-              className={`w-full px-4 py-2 border rounded-lg bg-black text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 ${
-                errors.location ? 'border-red-500' : 'border-gray-600'
-              }`}
-            />
-            {errors.location && <p className="text-red-400 text-sm mt-1">{errors.location}</p>}
+        <div className="form-grid-2">
+          <div className="form-field">
+            <label htmlFor="location">Location <span className="required">*</span></label>
+            <input type="text" id="location" name="location" value={formData.location} onChange={handleInputChange}
+              placeholder="e.g. Amsterdam, Netherlands" className={errors.location ? 'input-error' : ''} />
+            {errors.location && <p className="field-error">{errors.location}</p>}
           </div>
-          <div className="form-group">
-            <label htmlFor="venue" className="block text-sm font-medium mb-2">
-              Venue
-            </label>
-            <input
-              type="text"
-              id="venue"
-              name="venue"
-              value={formData.venue}
-              onChange={handleInputChange}
-              placeholder="Example: Technology Center"
-              className={`w-full px-4 py-2 border rounded-lg bg-black text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 ${
-                errors.venue ? 'border-red-500' : 'border-gray-600'
-              }`}
-            />
-            {errors.venue && <p className="text-red-400 text-sm mt-1">{errors.venue}</p>}
+          <div className="form-field">
+            <label htmlFor="venue">Venue<span className="required"> *</span></label>
+            <input type="text" id="venue" name="venue" value={formData.venue} onChange={handleInputChange}
+              placeholder="e.g. Tech Conference Center" className={errors.venue ? 'input-error' : ''} />
+            {errors.venue && <p className="field-error">{errors.venue}</p>}
           </div>
         </div>
 
         {/* Date & Time */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="form-group">
-            <label htmlFor="date" className="block text-sm font-medium mb-2">
-              Date *
-            </label>
-            <input
-              type="date"
-              id="date"
-              name="date"
-              value={formData.date}
-              onChange={handleInputChange}
-              className={`w-full px-4 py-2 border rounded-lg bg-black text-white focus:outline-none focus:border-cyan-400 ${
-                errors.date ? 'border-red-500' : 'border-gray-600'
-              }`}
-            />
-            {errors.date && <p className="text-red-400 text-sm mt-1">{errors.date}</p>}
+        <div className="form-grid-2">
+          <div className="form-field">
+            <label htmlFor="date">Date <span className="required">*</span></label>
+            <input type="date" id="date" name="date" value={formData.date} onChange={handleInputChange}
+              className={errors.date ? 'input-error' : ''} />
+            {errors.date && <p className="field-error">{errors.date}</p>}
           </div>
-          <div className="form-group">
-            <label htmlFor="time" className="block text-sm font-medium mb-2">
-              Time *
-            </label>
-            <input
-              type="time"
-              id="time"
-              name="time"
-              value={formData.time}
-              onChange={handleInputChange}
-              className={`w-full px-4 py-2 border rounded-lg bg-black text-white focus:outline-none focus:border-cyan-400 ${
-                errors.time ? 'border-red-500' : 'border-gray-600'
-              }`}
-            />
-            {errors.time && <p className="text-red-400 text-sm mt-1">{errors.time}</p>}
+          <div className="form-field">
+            <label htmlFor="time">Time <span className="required">*</span></label>
+            <input type="time" id="time" name="time" value={formData.time} onChange={handleInputChange}
+              className={errors.time ? 'input-error' : ''} />
+            {errors.time && <p className="field-error">{errors.time}</p>}
           </div>
         </div>
 
         {/* Mode & Audience */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="form-group">
-            <label htmlFor="mode" className="block text-sm font-medium mb-2">
-              Event Type *
-            </label>
-            <select
-              id="mode"
-              name="mode"
-              value={formData.mode}
-              onChange={handleInputChange}
-              className={`w-full px-4 py-2 border rounded-lg bg-black text-white focus:outline-none focus:border-cyan-400 ${
-                errors.mode ? 'border-red-500' : 'border-gray-600'
-              }`}
-            >
+        <div className="form-grid-2">
+          <div className="form-field">
+            <label htmlFor="mode">Event Type <span className="required">*</span></label>
+            <select id="mode" name="mode" value={formData.mode} onChange={handleInputChange}
+              className={errors.mode ? 'input-error' : ''}>
               <option value="offline">Offline</option>
               <option value="online">Online</option>
               <option value="hybrid">Hybrid</option>
             </select>
-            {errors.mode && <p className="text-red-400 text-sm mt-1">{errors.mode}</p>}
+            {errors.mode && <p className="field-error">{errors.mode}</p>}
           </div>
-          <div className="form-group">
-            <label htmlFor="audience" className="block text-sm font-medium mb-2">
-              Target Audience *
-            </label>
-            <input
-              type="text"
-              id="audience"
-              name="audience"
-              value={formData.audience}
-              onChange={handleInputChange}
-              placeholder="Example: Beginners, Professionals"
-              className={`w-full px-4 py-2 border rounded-lg bg-black text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 ${
-                errors.audience ? 'border-red-500' : 'border-gray-600'
-              }`}
-            />
-            {errors.audience && <p className="text-red-400 text-sm mt-1">{errors.audience}</p>}
+          <div className="form-field">
+            <label htmlFor="audience">Target Audience <span className="required">*</span></label>
+            <input type="text" id="audience" name="audience" value={formData.audience} onChange={handleInputChange}
+              placeholder="e.g. Developers, Beginners" className={errors.audience ? 'input-error' : ''} />
+            {errors.audience && <p className="field-error">{errors.audience}</p>}
           </div>
         </div>
 
+        {/* Capacity */}
+        <div className="form-field">
+          <label htmlFor="capacity">Event Capacity <span className="required">*</span></label>
+          <input type="number" id="capacity" name="capacity" value={formData.capacity} onChange={handleInputChange}
+            placeholder="e.g. 100 (maximum number of attendees)" min="1" max="100000" className={errors.capacity ? 'input-error' : ''} />
+          {errors.capacity && <p className="field-error">{errors.capacity}</p>}
+          <p className="field-hint">Maximum number of people who can book this event</p>
+        </div>
+
         {/* Organizer & Tags */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="form-group">
-            <label htmlFor="organizer" className="block text-sm font-medium mb-2">
-              Organizer *
-            </label>
-            <input
-              type="text"
-              id="organizer"
-              name="organizer"
-              value={formData.organizer}
-              onChange={handleInputChange}
-              placeholder="Example: Tech Community"
-              className={`w-full px-4 py-2 border rounded-lg bg-black text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 ${
-                errors.organizer ? 'border-red-500' : 'border-gray-600'
-              }`}
-            />
-            {errors.organizer && <p className="text-red-400 text-sm mt-1">{errors.organizer}</p>}
+        <div className="form-grid-2">
+          <div className="form-field">
+            <label htmlFor="organizer">Organizer <span className="required">*</span></label>
+            <input type="text" id="organizer" name="organizer" value={formData.organizer} onChange={handleInputChange}
+              placeholder="e.g. Tech Community" className={errors.organizer ? 'input-error' : ''} />
+            {errors.organizer && <p className="field-error">{errors.organizer}</p>}
           </div>
-          <div className="form-group">
-            <label htmlFor="tags" className="block text-sm font-medium mb-2">
-              Tags *
-            </label>
-            <input
-              type="text"
-              id="tags"
-              name="tags"
-              value={formData.tags}
-              onChange={handleInputChange}
-              placeholder="Example: web, javascript, react"
-              className={`w-full px-4 py-2 border rounded-lg bg-black text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 ${
-                errors.tags ? 'border-red-500' : 'border-gray-600'
-              }`}
-            />
-            {errors.tags && <p className="text-red-400 text-sm mt-1">{errors.tags}</p>}
-            <p className="text-xs text-gray-400 mt-1">Separated by commas</p>
+          <div className="form-field">
+            <label htmlFor="tags">Tags <span className="required">*</span></label>
+            <input type="text" id="tags" name="tags" value={formData.tags} onChange={handleInputChange}
+              placeholder="e.g. web, javascript, react" className={errors.tags ? 'input-error' : ''} />
+            {errors.tags && <p className="field-error">{errors.tags}</p>}
+            <p className="field-hint">Separated by commas</p>
           </div>
+        </div>
+
+        {/* Agenda */}
+        <div className="form-field">
+          <label>Agenda <span className="required">*</span></label>
+          <p className="field-hint mb-3">Add the schedule items for your event</p>
+          <div className="agenda-builder">
+            {agendaItems.map((item, index) => (
+              <div key={index} className="agenda-item-row">
+                <span className="agenda-grip"><GripVertical size={16} /></span>
+                <span className="agenda-number">{index + 1}</span>
+                <input
+                  type="text"
+                  value={item}
+                  onChange={(e) => handleAgendaChange(index, e.target.value)}
+                  placeholder={`e.g. ${['Opening Keynote', 'Workshop Session', 'Panel Discussion', 'Networking'][index % 4]}`}
+                  className="agenda-input"
+                />
+                <button type="button" onClick={() => removeAgendaItem(index)} className="agenda-remove" disabled={agendaItems.length === 1}>
+                  <Trash2 size={15} />
+                </button>
+              </div>
+            ))}
+            <button type="button" onClick={addAgendaItem} className="agenda-add-btn">
+              <Plus size={16} /> Add Agenda Item
+            </button>
+          </div>
+          {errors.agenda && <p className="field-error mt-2">{errors.agenda}</p>}
         </div>
 
         {/* Submit Error */}
         {errors.submit && (
-          <div className="bg-red-500/20 border border-red-500 rounded-lg p-4">
-            <p className="text-red-400">{errors.submit}</p>
+          <div className="submit-error">
+            <p>{errors.submit}</p>
           </div>
         )}
 
         {/* Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-6">
-          <button
-            type="submit"
-            disabled={loading}
-            className="flex-1 px-4 sm:px-6 py-2 sm:py-3 bg-cyan-500 hover:bg-cyan-600 disabled:bg-gray-600 text-black text-sm sm:text-base font-bold rounded-lg transition duration-200"
-          >
-            {loading ? 'Creating...' : 'Create Event'}
+        <div className="form-actions">
+          <button type="submit" disabled={loading} className="btn-primary">
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="btn-spinner" /> Creating...
+              </span>
+            ) : 'Create Event'}
           </button>
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="flex-1 px-4 sm:px-6 py-2 sm:py-3 border border-gray-600 hover:border-gray-400 text-white text-sm sm:text-base rounded-lg transition duration-200"
-          >
-            Cancel
-          </button>
+          <button type="button" onClick={() => router.back()} className="btn-secondary">Cancel</button>
         </div>
       </form>
     </section>

@@ -15,6 +15,7 @@ export interface IEvent extends Document {
   agenda: string[];
   organizer: string;
   tags: string[];
+  capacity: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -93,6 +94,11 @@ const eventSchema = new Schema<IEvent>(
         validator: (v: string[]) => Array.isArray(v) && v.length > 0,
         message: 'Tags must be a non-empty array',
       },
+    },
+    capacity: {
+      type: Number,
+      required: [true, 'Event capacity is required'],
+      min: [1, 'Capacity must be at least 1'],
     },
   },
   { timestamps: true }

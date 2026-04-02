@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Booking from '@/database/booking.model';
+import Event from '@/database/event.model';
 
 export async function POST(req: NextRequest) {
     try {
@@ -21,6 +22,23 @@ export async function POST(req: NextRequest) {
         if (existingBooking) {
             return NextResponse.json(
                 { message: 'You have already booked this event' },
+                { status: 409 }
+            );
+        }
+
+        // Check event capacity
+        const event = await Event.findById(eventId);
+        if (!event) {
+            return NextResponse.json(
+                { message: 'Event not found' },
+                { status: 404 }
+            );
+        }
+
+        const bookingCount = await Booking.countDocuments({ slug });
+        if (bookingCount >= event.capacity) {
+            return NextResponse.json(
+                { message: 'Event is fully booked' },
                 { status: 409 }
             );
         }
