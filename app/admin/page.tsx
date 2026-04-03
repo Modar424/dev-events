@@ -370,6 +370,9 @@ export default function AdminDashboard() {
             </div>
             <div className="flex items-center gap-3">
               <ThemeToggle />
+              <Link href="/admin/registrations" className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm text-black transition-all hover:scale-105" style={{ background: 'linear-gradient(135deg, #34d399, #22d3ee)', boxShadow: '0 0 20px rgba(52,211,153,0.3)' }}>
+                <Users size={16} /> Registrations
+              </Link>
               <Link href="/events/create" className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm text-black transition-all hover:scale-105" style={{ background: 'linear-gradient(135deg, #22d3ee, #a855f7)', boxShadow: '0 0 20px rgba(34,211,238,0.3)' }}>
                 <Plus size={16} /> New Event
               </Link>

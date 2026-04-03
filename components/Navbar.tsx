@@ -45,7 +45,7 @@ const Navbar = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 dark:bg-[#030708]/80 bg-white/80 backdrop-blur-xl border-b dark:border-white/6 border-black/6 transition-colors duration-300">
+    <header className="sticky top-0 z-10 backdrop-blur-sm border-b dark:border-white/6 border-black/6 transition-colors duration-300">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
 
      {/* Logo */}
@@ -178,7 +178,7 @@ const Navbar = () => {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="sm:hidden overflow-hidden dark:bg-[#030708]/95 bg-white/95 backdrop-blur-xl border-t dark:border-white/6 border-black/6"
+            className="sm:hidden overflow-hidden backdrop-blur-sm border-t dark:border-white/6 border-black/6"
           >
             <div className="px-4 py-3 flex flex-col gap-1">
               {/* Home — always */}

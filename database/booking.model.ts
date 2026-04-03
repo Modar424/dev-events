@@ -5,6 +5,9 @@ export interface IBooking extends Document {
   eventId: Types.ObjectId;
   email: string;
   slug: string;
+  emailVerified: boolean;
+  verificationToken: string | null;
+  verificationTokenExpiry: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -22,7 +25,6 @@ const bookingSchema = new Schema<IBooking>(
       trim: true,
       lowercase: true,
       validate: {
-        // Email validation regex
         validator: (v: string) =>
           /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
         message: 'Email must be a valid email address',
@@ -33,21 +35,31 @@ const bookingSchema = new Schema<IBooking>(
       required: [true, 'Slug is required'],
       trim: true,
     },
+    emailVerified: {
+      type: Boolean,
+      default: false,
+    },
+    verificationToken: {
+      type: String,
+      default: null,
+    },
+    verificationTokenExpiry: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true }
 );
 
-// Verify that referenced event exists before saving
 bookingSchema.pre<IBooking>('save', async function () {
-  // Check if event exists in the database
   const eventExists = await Event.findById(this.eventId);
   if (!eventExists) {
     throw new Error('Referenced event does not exist');
   }
 });
 
-// Create index on eventId for faster queries
 bookingSchema.index({ eventId: 1 });
+bookingSchema.index({ email: 1, slug: 1 }, { unique: true });
 
 const Booking = mongoose.models.Booking || mongoose.model<IBooking>('Booking', bookingSchema);
 

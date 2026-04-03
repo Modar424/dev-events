@@ -9,14 +9,13 @@ interface Props {
 
 const BookEvent = ({ eventId, slug }: Props) => {
     const [email, setEmail] = useState('');
-    const [submitted, setSubmitted] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
+    const [status, setStatus] = useState<'idle' | 'loading' | 'sent' | 'error'>('idle');
+    const [errorMessage, setErrorMessage] = useState('');
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
-        setError('');
+        setErrorMessage('');
+        setStatus('loading');
 
         try {
             const res = await fetch('/api/bookings', {
@@ -28,20 +27,26 @@ const BookEvent = ({ eventId, slug }: Props) => {
             const data = await res.json();
 
             if (!res.ok) {
-                setError(data.message || 'Something went wrong');
+                setErrorMessage(data.message || 'Something went wrong');
+                setStatus('error');
                 return;
             }
 
-            setSubmitted(true);
-        } catch {
-            setError('Failed to book. Please try again.');
-        } finally {
-            setLoading(false);
+            setStatus('sent');
+            setEmail('');
+        } catch (error) {
+            setErrorMessage('Failed to send verification email');
+            setStatus('error');
         }
     };
 
-    if (submitted) {
-        return <p className="text-sm mt-2">Thank you for signing up!</p>;
+    if (status === 'sent') {
+        return (
+            <div className="mt-2">
+                <p className="text-green-600 font-medium text-sm">✅ Check your email for verification link!</p>
+                <p className="text-gray-600 text-xs mt-1">Click the link to confirm your registration</p>
+            </div>
+        );
     }
 
     return (
@@ -56,19 +61,20 @@ const BookEvent = ({ eventId, slug }: Props) => {
                         id="email"
                         placeholder="Enter your email address"
                         required
+                        disabled={status === 'loading'}
                     />
                 </div>
 
-                {error && (
-                    <p className="text-red-500 text-sm mt-1">{error}</p>
+                {status === 'error' && errorMessage && (
+                    <p className="text-red-500 text-sm mt-1">{errorMessage}</p>
                 )}
 
                 <button
                     type="submit"
                     className="button-submit"
-                    disabled={loading}
+                    disabled={status === 'loading'}
                 >
-                    {loading ? 'Booking...' : 'Submit'}
+                    {status === 'loading' ? 'Sending email...' : 'Submit'}
                 </button>
             </form>
         </div>
