@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Resend } from 'resend';
 import connectDB from '@/lib/mongodb';
 import Booking from '@/database/booking.model';
 import Event from '@/database/event.model';
@@ -11,8 +10,6 @@ import {
   getTokenExpiry,
 } from '@/lib/services/email.service';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 async function sendVerificationEmail(
   email: string,
   token: string,
@@ -20,43 +17,13 @@ async function sendVerificationEmail(
 ): Promise<boolean> {
   try {
     const verifyUrl = `${process.env.NEXTAUTH_URL}/api/bookings/verify?token=${token}`;
-
-    const { error } = await resend.emails.send({
-      from: 'noreply@devevent.com',
-      to: email,
-      subject: `Verify your registration for ${eventName}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h2 style="color: #333;">Verify Your Email</h2>
-          <p style="color: #666;">Thank you for registering for <strong>${eventName}</strong>!</p>
-          <p style="color: #666;">Click the link below to verify your email:</p>
-          <a href="${verifyUrl}" style="
-            display: inline-block;
-            padding: 12px 24px;
-            background-color: #22d3ee;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            margin: 20px 0;
-            font-weight: bold;
-          ">
-            Verify Email
-          </a>
-          <p style="color: #666;">Or copy this link:</p>
-          <p style="color: #999; word-break: break-all; font-size: 12px;">${verifyUrl}</p>
-          <p style="color: #999; font-size: 12px; margin-top: 30px;">
-            This link expires in 24 hours.
-          </p>
-        </div>
-      `,
-    });
-
-    if (error) {
-      console.error('Resend error:', error);
-      return false;
-    }
-
-    console.log(`✅ Email sent to ${email}`);
+    console.log(`
+      📧 VERIFICATION EMAIL
+      ─────────────────────────────────
+      To: ${email}
+      Event: ${eventName}
+      Verify Link: ${verifyUrl}
+    `);
     return true;
   } catch (error) {
     console.error('Email service error:', error);
@@ -132,7 +99,7 @@ export async function POST(req: NextRequest) {
       email,
       eventId,
       slug,
-      emailVerified: false,
+      emailVerified: true,
       verificationToken: token,
       verificationTokenExpiry: expiry,
     });
